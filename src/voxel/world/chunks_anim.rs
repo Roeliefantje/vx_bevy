@@ -25,6 +25,7 @@ fn attach_chunk_animation(
     time: Res<Time>,
     mut commands: Commands,
 ) {
+    let _attach_chunk_animation = info_span!("attach_chunk_animation", name="attack_chunk_animation").entered();
     removed_chunk_meshes.read().for_each(|entity| {
         if ready_chunks.contains(entity) {
             commands.entity(entity).insert(ChunkSpawnAnimation {
@@ -44,6 +45,7 @@ fn step_chunk_animation(
     time: Res<Time>,
     mut commands: Commands,
 ) {
+    let _step_chunk_animation_span = info_span!("step_chunk_animation", name="step_chunk_animation").entered();
     chunks.for_each_mut(|(entity, mut transform, _chunk, animation)| {
         let delta = (time.elapsed_seconds() - animation.start_time).min(ANIMATION_DURATION);
 

@@ -26,6 +26,8 @@ pub fn prepare_chunks(
     material: Res<ChunkMaterialSingleton>,
     mut cmds: Commands,
 ) {
+    let _prepare_chunks_span = info_span!("prepare_chunks", name="prepare_chunks").entered();
+
     for (chunk, chunk_key) in chunks.iter() {
         let mut entity_commands = cmds.entity(chunk);
         entity_commands.insert((
@@ -56,6 +58,7 @@ fn queue_mesh_tasks(
     chunk_entities: Res<ChunkEntities>,
     chunks: Res<ChunkMap<Voxel, ChunkShape>>,
 ) {
+    let _queue_mesh_tasks_span = info_span!("queue_mesh_tasks", name="queue_mesh_tasks").entered();
     let task_pool = AsyncComputeTaskPool::get();
 
     dirty_chunks
@@ -94,6 +97,7 @@ fn process_mesh_tasks(
     mut chunk_query: Query<(Entity, &Handle<Mesh>, &mut ChunkMeshingTask), With<Chunk>>,
     mut commands: Commands,
 ) {
+    let _process_mesh_tasks_span = info_span!("process_mesh_tasks", name="process_mesh_tasks").entered();
     chunk_query.for_each_mut(|(entity, handle, mut mesh_task)| {
         if let Some(mesh) = future::block_on(future::poll_once(&mut mesh_task.0)) {
             *meshes.get_mut(handle).unwrap() = mesh;

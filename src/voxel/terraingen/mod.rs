@@ -4,6 +4,7 @@ use std::{collections::BTreeMap, sync::RwLock};
 use bevy::{
     math::{IVec3, Vec3Swizzles},
     prelude::Plugin,
+    prelude::*,
 };
 use once_cell::sync::Lazy;
 
@@ -56,6 +57,8 @@ impl TerrainGenerator {
     }
 
     pub fn generate(&self, chunk_key: IVec3, buffer: &mut VoxelBuffer<Voxel, ChunkShape>) {
+
+        let _terraingenerator_generate = info_span!("terraingenerator_generate", name="terraingenerator_generate").entered();
         let biome = self.biome_at(chunk_key);
         let noise = generate_heightmap_data(chunk_key, CHUNK_LENGTH_U);
 

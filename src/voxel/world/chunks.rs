@@ -1,10 +1,8 @@
 use bevy::{
-    math::IVec3,
-    prelude::{
+    log::info_span, math::IVec3, prelude::{
         Changed, Commands, Entity, GlobalTransform, IntoSystemConfigs, Last, Plugin, PostUpdate,
         Query, Res, ResMut, Resource, SystemSet, Update, With,
-    },
-    utils::{HashMap, HashSet},
+    }, utils::{HashMap, HashSet}
 };
 use float_ord::FloatOrd;
 
@@ -17,6 +15,8 @@ fn update_player_pos(
     player: Query<&GlobalTransform, (With<PlayerController>, Changed<GlobalTransform>)>,
     mut chunk_pos: ResMut<CurrentLocalPlayerChunk>,
 ) {
+    let _player_pos_update_span = info_span!("update_player_pos", name="update_player_pos").entered();
+
     if let Ok(ply) = player.get_single() {
         let player_coords = ply.translation().as_ivec3();
         let nearest_chunk_origin = !IVec3::splat((CHUNK_LENGTH - 1) as i32) & player_coords;
@@ -36,6 +36,8 @@ fn update_view_chunks(
     view_radius: Res<ChunkLoadRadius>,
     mut chunk_command_queue: ResMut<ChunkCommandQueue>,
 ) {
+
+    let _update_view_chunks_span = info_span!("update_view_chunks", name="update_view_chunks").entered();
     // quick n dirty circular chunk loading.
     //perf: optimize this.
     for x in -view_radius.horizontal..view_radius.horizontal {
@@ -91,6 +93,8 @@ fn create_chunks(
     mut chunk_entities: ResMut<ChunkEntities>,
     mut cmds: Commands,
 ) {
+    let _create_chunks_span = info_span!("create_chunks", name="create_chunks").entered();
+
     chunks_command_queue
         .create
         .drain(..)

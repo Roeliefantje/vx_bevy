@@ -6,7 +6,8 @@
 
 use std::f32::consts::PI;
 
-use bevy::{core_pipeline::fxaa::Fxaa, prelude::*};
+use bevy::{core_pipeline::fxaa::Fxaa, prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}};
+use bevy_egui::egui::Frame;
 
 mod debug;
 mod voxel;
@@ -14,6 +15,8 @@ mod voxel;
 fn main() {
     let mut app = App::default();
     app.add_plugins(DefaultPlugins)
+        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(LogDiagnosticsPlugin::default())
         .add_plugins(voxel::VoxelWorldPlugin)
         .add_plugins(debug::DebugUIPlugins)
         .add_systems(Startup, setup)

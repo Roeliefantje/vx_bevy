@@ -10,7 +10,7 @@ use crate::voxel::{
 use bevy::{
     prelude::{
         Added, Commands, Component, Entity, IntoSystemConfigs, IntoSystemSetConfigs, Plugin, Query,
-        ResMut, SystemSet, Update,
+        ResMut, SystemSet, Update, info_span
     },
     tasks::{AsyncComputeTaskPool, Task},
 };
@@ -18,6 +18,7 @@ use futures_lite::future;
 
 /// Queues the terrain gen async tasks for the newly created chunks.
 fn queue_terrain_gen(mut commands: Commands, new_chunks: Query<(Entity, &Chunk), Added<Chunk>>) {
+    let _queue_terrain_gen_span = info_span!("queue_terrain_gen", name="queue_terrain_gen").entered();
     let task_pool = AsyncComputeTaskPool::get();
 
     new_chunks
@@ -49,6 +50,7 @@ pub fn process_terrain_gen(
     mut dirty_chunks: ResMut<DirtyChunks>,
     mut gen_chunks: Query<(Entity, &Chunk, &mut TerrainGenTask)>,
 ) {
+    let _process_terrain_gen_span = info_span!("process_terrain_gen", name="process_terrain_gen").entered();
     gen_chunks.for_each_mut(|(entity, chunk, mut gen_task)| {
         if let Some(data) = future::block_on(future::poll_once(&mut gen_task.0)) {
             chunk_data.insert(chunk.0, data);
