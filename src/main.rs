@@ -15,7 +15,7 @@ mod voxel;
 fn main() {
     let mut app = App::default();
     app.add_plugins(DefaultPlugins)
-        .add_plugins(FrameTimeDiagnosticsPlugin)
+        //.add_plugins(FrameTimeDiagnosticsPlugin)
         .add_plugins(LogDiagnosticsPlugin::default())
         .add_plugins(voxel::VoxelWorldPlugin)
         .add_plugins(debug::DebugUIPlugins)
