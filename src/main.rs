@@ -6,20 +6,28 @@
 
 use std::f32::consts::PI;
 
-use bevy::{core_pipeline::fxaa::Fxaa, prelude::*, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}};
-use bevy_egui::egui::Frame;
+use bevy::{core_pipeline::fxaa::Fxaa, diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin}, pbr::wireframe::{WireframeConfig, WireframePlugin}, prelude::*};
+use bevy::render::*;
+use bevy::render::settings::*;
 
 mod debug;
 mod voxel;
 
 fn main() {
     let mut app = App::default();
-    app.add_plugins(DefaultPlugins)
+    app.add_plugins(DefaultPlugins.set(RenderPlugin {
+        render_creation: RenderCreation::Automatic(WgpuSettings {
+        backends:Some(Backends::VULKAN),
+                        ..default()
+                })
+        }))
         //.add_plugins(FrameTimeDiagnosticsPlugin)
         .add_plugins(LogDiagnosticsPlugin::default())
+        .add_plugins(WireframePlugin)
         .add_plugins(voxel::VoxelWorldPlugin)
         .add_plugins(debug::DebugUIPlugins)
         .add_systems(Startup, setup)
+        .add_systems(Startup, configure_wireframe)
         .run();
 }
 
@@ -37,8 +45,15 @@ fn setup(mut cmds: Commands) {
     .insert(Fxaa::default())
     .insert(bevy_atmosphere::plugin::AtmosphereCamera::default());
 
+
     cmds.insert_resource(AmbientLight {
         color: Color::WHITE,
         brightness: 1.0,
     });
+    
+}
+
+fn configure_wireframe(mut wireframe_config: ResMut<WireframeConfig>) {
+    // Enable wireframe globally
+    wireframe_config.global = true;
 }

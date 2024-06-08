@@ -40,13 +40,16 @@ fn update_view_chunks(
     let _update_view_chunks_span = info_span!("update_view_chunks", name="update_view_chunks").entered();
     // quick n dirty circular chunk loading.
     //perf: optimize this.
+    let hor = view_radius.horizontal * view_radius.horizontal;
     for x in -view_radius.horizontal..view_radius.horizontal {
+        let p_x = x * x;
         for z in -view_radius.horizontal..view_radius.horizontal {
-            for y in -view_radius.vertical..view_radius.vertical {
-                if x.pow(2) + z.pow(2) >= view_radius.horizontal.pow(2) {
-                    continue;
-                }
+            let p_xz = p_x + z * z;
+            if p_xz >= hor {
+                continue;
+            }
 
+            for y in -view_radius.vertical..view_radius.vertical {
                 let chunk_key = {
                     let mut pos: IVec3 = player_pos.chunk_min
                         + IVec3::new(

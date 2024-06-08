@@ -1,9 +1,8 @@
 use bevy::{
-    prelude::{
+    pbr::wireframe::Wireframe, prelude::{
         Commands, Component, Entity, IntoSystemConfigs, IntoSystemSetConfigs, Plugin, PostUpdate,
         Query, RemovedComponents, Res, SystemSet, Transform, Update, Visibility, *
-    },
-    time::Time,
+    }, time::Time
 };
 
 use super::{
@@ -30,7 +29,7 @@ fn attach_chunk_animation(
         if ready_chunks.contains(entity) {
             commands.entity(entity).insert(ChunkSpawnAnimation {
                 start_time: time.elapsed_seconds(),
-            });
+            }).insert(Wireframe);
             if let Ok((mut transform, mut visibility, chunk)) = ready_chunks.get_mut(entity) {
                 *visibility = Visibility::Visible;
                 transform.translation.y = chunk.0.y as f32 - ANIMATION_HEIGHT;

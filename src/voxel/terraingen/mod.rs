@@ -1,5 +1,6 @@
 use float_ord::FloatOrd;
 use std::{collections::BTreeMap, sync::RwLock};
+use std::time::{Duration, Instant};
 
 use bevy::{
     math::{IVec3, Vec3Swizzles},
@@ -60,14 +61,19 @@ impl TerrainGenerator {
 
         let _terraingenerator_generate = info_span!("terraingenerator_generate", name="terraingenerator_generate").entered();
         let biome = self.biome_at(chunk_key);
-        let noise = generate_heightmap_data(chunk_key, CHUNK_LENGTH_U);
 
+        let mut now: Instant = Instant::now();
+        let noise = generate_heightmap_data(chunk_key, CHUNK_LENGTH_U);
+        println!("NOISE: {:.2?}", now.elapsed());
+        
         let noise_map = Heightmap::<CHUNK_LENGTH_U, CHUNK_LENGTH_U>::from_slice(&noise);
 
+        now = Instant::now();
         common::terrain_carve_heightmap(buffer, chunk_key, &noise_map);
 
         biome.carve_terrain(chunk_key, noise_map, buffer);
         biome.decorate_terrain(chunk_key, noise_map, buffer);
+        println!("CARVE n DECORAsTE: {:.2?}", now.elapsed());
 
         if chunk_key.y == 0 {
             terrain_generate_world_bottom_border(buffer);
